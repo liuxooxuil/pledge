@@ -1,0 +1,3131 @@
+{
+	"id": "a412db5e9e1729e83ef0ba12d1cb3be7",
+	"_format": "hh-sol-build-info-1",
+	"solcVersion": "0.8.34",
+	"solcLongVersion": "0.8.34+commit.80d5c536",
+	"input": {
+		"language": "Solidity",
+		"sources": {
+			"contracts/interfaces/IXYYDividend.sol": {
+				"content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\n/**\r\n * @title IXYYDividend\r\n * @notice XYYDividend 合约接口 — Contract B\r\n * @dev Contract A (XYYTokenV2) 通过此接口调用分红系统\r\n */\r\ninterface IXYYDividend {\r\n    // ============ 事件 ============\r\n    event NFTQualificationChanged(address indexed user, bool qualified, uint256 stakeAmount);\r\n    event NFTBMinted(address indexed user, uint256 amount);\r\n    event NFTBClaimed(address indexed user, uint256 amount);\r\n    event NFTBBurned(address indexed user, uint256 amount);\r\n    event BurnDividendClaimed(address indexed user, uint256 amount);\r\n    event BurnExecuted(uint256 burnAmount, uint256 toDead, uint256 toDividend);\r\n\r\n    // ============ Contract A → Contract B 状态变更 ============\r\n\r\n    /// @notice 设置用户 NFT 分红资格（新获得资格）\r\n    function setNFTQualification(address user, bool qualified, uint256 stakeAmount) external;\r\n\r\n    /// @notice 更新已有 NFT 资格用户的质押金额\r\n    function updateNFTStake(address user, uint256 newAmount) external;\r\n\r\n    /// @notice 撤销用户 NFT 资格\r\n    function revokeNFTQualification(address user) external;\r\n\r\n    /// @notice 累积 NFT 分红奖励（payable，传入 BNB）\r\n    function accumulateNftReward(uint256 amount) external payable;\r\n\r\n    /// @notice 更新用户有效质押状态（用于燃烧分红）\r\n    function updateValidStake(address user, uint256 amount, bool isValid) external;\r\n\r\n    /// @notice 清理过期 NFT 持有者，返回本次清理数量\r\n    function cleanupExpiredNftHolders() external returns (uint256);\r\n\r\n    /// @notice 清理过期有效质押者，返回本次清理数量\r\n    function cleanupExpiredValidStakeHolders() external returns (uint256);\r\n\r\n    /// @notice 代用户领取燃烧分红（复投时自动调用）\r\n    function claimBurnDividendFor(address user) external returns (uint256);\r\n\r\n    // ============ 用户直接调用 ============\r\n\r\n    /// @notice 用户领取 NFT 分红（销毁 NFTB 换 BNB）\r\n    function claimNftDividend(uint256 amount) external;\r\n\r\n    /// @notice NFTB 自动兑换回调（NFTB 转入时触发）\r\n    function autoClaimForUser(address user, uint256 amount) external;\r\n\r\n    /// @notice 用户领取燃烧分红（XYY 代币）\r\n    function claimBurnDividend() external;\r\n\r\n    // ============ 底池燃烧 ============\r\n\r\n    /// @notice 执行底池燃烧（由 Contract A 的 triggerDailyProcess 调用）\r\n    function executeDailyBurn() external;\r\n\r\n    /// @notice 接收燃烧分红代币并更新账本\r\n    function receiveBurnDividend(uint256 toDividend) external;\r\n\r\n    // ============ 视图函数 ============\r\n\r\n    function hasNftQualification(address account) external view returns (bool);\r\n    function nftStakeAmount(address account) external view returns (uint256);\r\n    function pendingNftReward(address account) external view returns (uint256);\r\n    function pendingBurnDividend(address account) external view returns (uint256);\r\n    function totalNftStakeAmount() external view returns (uint256);\r\n    function totalValidStakeAmount() external view returns (uint256);\r\n    function nftDividendPool() external view returns (uint256);\r\n    function burnDividendPool() external view returns (uint256);\r\n    function accNftPerShare() external view returns (uint256);\r\n    function accBurnPerShare() external view returns (uint256);\r\n    function lastBurnTime() external view returns (uint256);\r\n\r\n    // ============ 迁移函数 ============\r\n    function batchSetNFTQualification(address[] calldata users, uint256[] calldata stakeAmounts) external;\r\n    function batchSetValidStake(address[] calldata users, uint256[] calldata amounts) external;\r\n    function lockMigration() external;\r\n}\r\n"
+			}
+		},
+		"settings": {
+			"optimizer": {
+				"enabled": false,
+				"runs": 200
+			},
+			"outputSelection": {
+				"*": {
+					"": [
+						"ast"
+					],
+					"*": [
+						"abi",
+						"metadata",
+						"devdoc",
+						"userdoc",
+						"storageLayout",
+						"evm.legacyAssembly",
+						"evm.bytecode",
+						"evm.deployedBytecode",
+						"evm.methodIdentifiers",
+						"evm.gasEstimates",
+						"evm.assembly"
+					]
+				}
+			},
+			"remappings": [
+				"@openzeppelin/contracts/=@openzeppelin/contracts@5.6.0/"
+			]
+		}
+	},
+	"output": {
+		"contracts": {
+			"contracts/interfaces/IXYYDividend.sol": {
+				"IXYYDividend": {
+					"abi": [
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": true,
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								}
+							],
+							"name": "BurnDividendClaimed",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "burnAmount",
+									"type": "uint256"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "toDead",
+									"type": "uint256"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "toDividend",
+									"type": "uint256"
+								}
+							],
+							"name": "BurnExecuted",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": true,
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								}
+							],
+							"name": "NFTBBurned",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": true,
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								}
+							],
+							"name": "NFTBClaimed",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": true,
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								}
+							],
+							"name": "NFTBMinted",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": true,
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "bool",
+									"name": "qualified",
+									"type": "bool"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "stakeAmount",
+									"type": "uint256"
+								}
+							],
+							"name": "NFTQualificationChanged",
+							"type": "event"
+						},
+						{
+							"inputs": [],
+							"name": "accBurnPerShare",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "accNftPerShare",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								}
+							],
+							"name": "accumulateNftReward",
+							"outputs": [],
+							"stateMutability": "payable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								}
+							],
+							"name": "autoClaimForUser",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address[]",
+									"name": "users",
+									"type": "address[]"
+								},
+								{
+									"internalType": "uint256[]",
+									"name": "stakeAmounts",
+									"type": "uint256[]"
+								}
+							],
+							"name": "batchSetNFTQualification",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address[]",
+									"name": "users",
+									"type": "address[]"
+								},
+								{
+									"internalType": "uint256[]",
+									"name": "amounts",
+									"type": "uint256[]"
+								}
+							],
+							"name": "batchSetValidStake",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "burnDividendPool",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "claimBurnDividend",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								}
+							],
+							"name": "claimBurnDividendFor",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								}
+							],
+							"name": "claimNftDividend",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "cleanupExpiredNftHolders",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "cleanupExpiredValidStakeHolders",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "executeDailyBurn",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "account",
+									"type": "address"
+								}
+							],
+							"name": "hasNftQualification",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "lastBurnTime",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "lockMigration",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "nftDividendPool",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "account",
+									"type": "address"
+								}
+							],
+							"name": "nftStakeAmount",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "account",
+									"type": "address"
+								}
+							],
+							"name": "pendingBurnDividend",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "account",
+									"type": "address"
+								}
+							],
+							"name": "pendingNftReward",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "toDividend",
+									"type": "uint256"
+								}
+							],
+							"name": "receiveBurnDividend",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								}
+							],
+							"name": "revokeNFTQualification",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"internalType": "bool",
+									"name": "qualified",
+									"type": "bool"
+								},
+								{
+									"internalType": "uint256",
+									"name": "stakeAmount",
+									"type": "uint256"
+								}
+							],
+							"name": "setNFTQualification",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "totalNftStakeAmount",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "totalValidStakeAmount",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "newAmount",
+									"type": "uint256"
+								}
+							],
+							"name": "updateNFTStake",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								},
+								{
+									"internalType": "bool",
+									"name": "isValid",
+									"type": "bool"
+								}
+							],
+							"name": "updateValidStake",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						}
+					],
+					"devdoc": {
+						"details": "Contract A (XYYTokenV2) 通过此接口调用分红系统",
+						"kind": "dev",
+						"methods": {},
+						"title": "IXYYDividend",
+						"version": 1
+					},
+					"evm": {
+						"assembly": "",
+						"bytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"deployedBytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"immutableReferences": {},
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"gasEstimates": null,
+						"legacyAssembly": null,
+						"methodIdentifiers": {
+							"accBurnPerShare()": "c8a0e14c",
+							"accNftPerShare()": "c52bb19e",
+							"accumulateNftReward(uint256)": "5c153adc",
+							"autoClaimForUser(address,uint256)": "94f7693a",
+							"batchSetNFTQualification(address[],uint256[])": "19b74894",
+							"batchSetValidStake(address[],uint256[])": "3b0d1357",
+							"burnDividendPool()": "24e83345",
+							"claimBurnDividend()": "caf55137",
+							"claimBurnDividendFor(address)": "b6dfe6ad",
+							"claimNftDividend(uint256)": "ddda100d",
+							"cleanupExpiredNftHolders()": "97fed038",
+							"cleanupExpiredValidStakeHolders()": "e9949e26",
+							"executeDailyBurn()": "de9eb5a0",
+							"hasNftQualification(address)": "3d5d6096",
+							"lastBurnTime()": "e3067449",
+							"lockMigration()": "0fc0482a",
+							"nftDividendPool()": "fee68cda",
+							"nftStakeAmount(address)": "c37e450c",
+							"pendingBurnDividend(address)": "7122e063",
+							"pendingNftReward(address)": "5cb769ba",
+							"receiveBurnDividend(uint256)": "6f45b423",
+							"revokeNFTQualification(address)": "28678102",
+							"setNFTQualification(address,bool,uint256)": "b631c4ca",
+							"totalNftStakeAmount()": "9a280d4e",
+							"totalValidStakeAmount()": "82179904",
+							"updateNFTStake(address,uint256)": "f6fe47f1",
+							"updateValidStake(address,uint256,bool)": "ff117898"
+						}
+					},
+					"metadata": "{\"compiler\":{\"version\":\"0.8.34+commit.80d5c536\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"BurnDividendClaimed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"burnAmount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"toDead\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"toDividend\",\"type\":\"uint256\"}],\"name\":\"BurnExecuted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"NFTBBurned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"NFTBClaimed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"NFTBMinted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"qualified\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stakeAmount\",\"type\":\"uint256\"}],\"name\":\"NFTQualificationChanged\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"accBurnPerShare\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"accNftPerShare\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"accumulateNftReward\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"autoClaimForUser\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"users\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"stakeAmounts\",\"type\":\"uint256[]\"}],\"name\":\"batchSetNFTQualification\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"users\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"amounts\",\"type\":\"uint256[]\"}],\"name\":\"batchSetValidStake\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"burnDividendPool\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"claimBurnDividend\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"claimBurnDividendFor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"claimNftDividend\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cleanupExpiredNftHolders\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cleanupExpiredValidStakeHolders\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"executeDailyBurn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasNftQualification\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lastBurnTime\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lockMigration\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nftDividendPool\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"nftStakeAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"pendingBurnDividend\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"pendingNftReward\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"toDividend\",\"type\":\"uint256\"}],\"name\":\"receiveBurnDividend\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"revokeNFTQualification\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"qualified\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"stakeAmount\",\"type\":\"uint256\"}],\"name\":\"setNFTQualification\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalNftStakeAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalValidStakeAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"newAmount\",\"type\":\"uint256\"}],\"name\":\"updateNFTStake\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isValid\",\"type\":\"bool\"}],\"name\":\"updateValidStake\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Contract A (XYYTokenV2) \\u901a\\u8fc7\\u6b64\\u63a5\\u53e3\\u8c03\\u7528\\u5206\\u7ea2\\u7cfb\\u7edf\",\"kind\":\"dev\",\"methods\":{},\"title\":\"IXYYDividend\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"accumulateNftReward(uint256)\":{\"notice\":\"\\u7d2f\\u79ef NFT \\u5206\\u7ea2\\u5956\\u52b1\\uff08payable\\uff0c\\u4f20\\u5165 BNB\\uff09\"},\"autoClaimForUser(address,uint256)\":{\"notice\":\"NFTB \\u81ea\\u52a8\\u5151\\u6362\\u56de\\u8c03\\uff08NFTB \\u8f6c\\u5165\\u65f6\\u89e6\\u53d1\\uff09\"},\"claimBurnDividend()\":{\"notice\":\"\\u7528\\u6237\\u9886\\u53d6\\u71c3\\u70e7\\u5206\\u7ea2\\uff08XYY \\u4ee3\\u5e01\\uff09\"},\"claimBurnDividendFor(address)\":{\"notice\":\"\\u4ee3\\u7528\\u6237\\u9886\\u53d6\\u71c3\\u70e7\\u5206\\u7ea2\\uff08\\u590d\\u6295\\u65f6\\u81ea\\u52a8\\u8c03\\u7528\\uff09\"},\"claimNftDividend(uint256)\":{\"notice\":\"\\u7528\\u6237\\u9886\\u53d6 NFT \\u5206\\u7ea2\\uff08\\u9500\\u6bc1 NFTB \\u6362 BNB\\uff09\"},\"cleanupExpiredNftHolders()\":{\"notice\":\"\\u6e05\\u7406\\u8fc7\\u671f NFT \\u6301\\u6709\\u8005\\uff0c\\u8fd4\\u56de\\u672c\\u6b21\\u6e05\\u7406\\u6570\\u91cf\"},\"cleanupExpiredValidStakeHolders()\":{\"notice\":\"\\u6e05\\u7406\\u8fc7\\u671f\\u6709\\u6548\\u8d28\\u62bc\\u8005\\uff0c\\u8fd4\\u56de\\u672c\\u6b21\\u6e05\\u7406\\u6570\\u91cf\"},\"executeDailyBurn()\":{\"notice\":\"\\u6267\\u884c\\u5e95\\u6c60\\u71c3\\u70e7\\uff08\\u7531 Contract A \\u7684 triggerDailyProcess \\u8c03\\u7528\\uff09\"},\"receiveBurnDividend(uint256)\":{\"notice\":\"\\u63a5\\u6536\\u71c3\\u70e7\\u5206\\u7ea2\\u4ee3\\u5e01\\u5e76\\u66f4\\u65b0\\u8d26\\u672c\"},\"revokeNFTQualification(address)\":{\"notice\":\"\\u64a4\\u9500\\u7528\\u6237 NFT \\u8d44\\u683c\"},\"setNFTQualification(address,bool,uint256)\":{\"notice\":\"\\u8bbe\\u7f6e\\u7528\\u6237 NFT \\u5206\\u7ea2\\u8d44\\u683c\\uff08\\u65b0\\u83b7\\u5f97\\u8d44\\u683c\\uff09\"},\"updateNFTStake(address,uint256)\":{\"notice\":\"\\u66f4\\u65b0\\u5df2\\u6709 NFT \\u8d44\\u683c\\u7528\\u6237\\u7684\\u8d28\\u62bc\\u91d1\\u989d\"},\"updateValidStake(address,uint256,bool)\":{\"notice\":\"\\u66f4\\u65b0\\u7528\\u6237\\u6709\\u6548\\u8d28\\u62bc\\u72b6\\u6001\\uff08\\u7528\\u4e8e\\u71c3\\u70e7\\u5206\\u7ea2\\uff09\"}},\"notice\":\"XYYDividend \\u5408\\u7ea6\\u63a5\\u53e3 \\u2014 Contract B\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/interfaces/IXYYDividend.sol\":\"IXYYDividend\"},\"evmVersion\":\"osaka\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[\":@openzeppelin/contracts/=@openzeppelin/contracts@5.6.0/\"]},\"sources\":{\"contracts/interfaces/IXYYDividend.sol\":{\"keccak256\":\"0xd4f3c110ae41622de3b087ad917e72f5a4d66ee157fdb2c48d4d271beb1fffe9\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ce4a6485d17fd4273d767536e39882d4be7f7e450aad3ab9e82a6c6093fa91f2\",\"dweb:/ipfs/QmUyDAqeQ39pjLErNF4xQjJ2dy9LSXLKSJB4TKX5a2AacQ\"]}},\"version\":1}",
+					"storageLayout": {
+						"storage": [],
+						"types": null
+					},
+					"userdoc": {
+						"kind": "user",
+						"methods": {
+							"accumulateNftReward(uint256)": {
+								"notice": "累积 NFT 分红奖励（payable，传入 BNB）"
+							},
+							"autoClaimForUser(address,uint256)": {
+								"notice": "NFTB 自动兑换回调（NFTB 转入时触发）"
+							},
+							"claimBurnDividend()": {
+								"notice": "用户领取燃烧分红（XYY 代币）"
+							},
+							"claimBurnDividendFor(address)": {
+								"notice": "代用户领取燃烧分红（复投时自动调用）"
+							},
+							"claimNftDividend(uint256)": {
+								"notice": "用户领取 NFT 分红（销毁 NFTB 换 BNB）"
+							},
+							"cleanupExpiredNftHolders()": {
+								"notice": "清理过期 NFT 持有者，返回本次清理数量"
+							},
+							"cleanupExpiredValidStakeHolders()": {
+								"notice": "清理过期有效质押者，返回本次清理数量"
+							},
+							"executeDailyBurn()": {
+								"notice": "执行底池燃烧（由 Contract A 的 triggerDailyProcess 调用）"
+							},
+							"receiveBurnDividend(uint256)": {
+								"notice": "接收燃烧分红代币并更新账本"
+							},
+							"revokeNFTQualification(address)": {
+								"notice": "撤销用户 NFT 资格"
+							},
+							"setNFTQualification(address,bool,uint256)": {
+								"notice": "设置用户 NFT 分红资格（新获得资格）"
+							},
+							"updateNFTStake(address,uint256)": {
+								"notice": "更新已有 NFT 资格用户的质押金额"
+							},
+							"updateValidStake(address,uint256,bool)": {
+								"notice": "更新用户有效质押状态（用于燃烧分红）"
+							}
+						},
+						"notice": "XYYDividend 合约接口 — Contract B",
+						"version": 1
+					}
+				}
+			}
+		},
+		"sources": {
+			"contracts/interfaces/IXYYDividend.sol": {
+				"ast": {
+					"absolutePath": "contracts/interfaces/IXYYDividend.sol",
+					"exportedSymbols": {
+						"IXYYDividend": [
+							215
+						]
+					},
+					"id": 216,
+					"license": "MIT",
+					"nodeType": "SourceUnit",
+					"nodes": [
+						{
+							"id": 1,
+							"literals": [
+								"solidity",
+								"^",
+								"0.8",
+								".20"
+							],
+							"nodeType": "PragmaDirective",
+							"src": "33:24:0"
+						},
+						{
+							"abstract": false,
+							"baseContracts": [],
+							"canonicalName": "IXYYDividend",
+							"contractDependencies": [],
+							"contractKind": "interface",
+							"documentation": {
+								"id": 2,
+								"nodeType": "StructuredDocumentation",
+								"src": "61:151:0",
+								"text": " @title IXYYDividend\n @notice XYYDividend 合约接口 — Contract B\n @dev Contract A (XYYTokenV2) 通过此接口调用分红系统"
+							},
+							"fullyImplemented": false,
+							"id": 215,
+							"linearizedBaseContracts": [
+								215
+							],
+							"name": "IXYYDividend",
+							"nameLocation": "224:12:0",
+							"nodeType": "ContractDefinition",
+							"nodes": [
+								{
+									"anonymous": false,
+									"eventSelector": "46b99c59bd9c1f7334b2dcd7da312900bbd92ffd1c2fb19573f26c992e71f555",
+									"id": 10,
+									"name": "NFTQualificationChanged",
+									"nameLocation": "291:23:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 9,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 4,
+												"indexed": true,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "331:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 10,
+												"src": "315:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 3,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "315:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 6,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "qualified",
+												"nameLocation": "342:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 10,
+												"src": "337:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 5,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "337:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 8,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "stakeAmount",
+												"nameLocation": "361:11:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 10,
+												"src": "353:19:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 7,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "353:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "314:59:0"
+									},
+									"src": "285:89:0"
+								},
+								{
+									"anonymous": false,
+									"eventSelector": "0eb95003f92a191275ee6126603e1079aa639899c303750009f656f57ecef7e3",
+									"id": 16,
+									"name": "NFTBMinted",
+									"nameLocation": "386:10:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 15,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 12,
+												"indexed": true,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "413:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 16,
+												"src": "397:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 11,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "397:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 14,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "427:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 16,
+												"src": "419:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 13,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "419:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "396:38:0"
+									},
+									"src": "380:55:0"
+								},
+								{
+									"anonymous": false,
+									"eventSelector": "635fd0f923949c59e45795ae0c28062f7aa571fc8b505d610c1e813a56df89e9",
+									"id": 22,
+									"name": "NFTBClaimed",
+									"nameLocation": "447:11:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 21,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 18,
+												"indexed": true,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "475:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 22,
+												"src": "459:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 17,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "459:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 20,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "489:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 22,
+												"src": "481:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 19,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "481:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "458:38:0"
+									},
+									"src": "441:56:0"
+								},
+								{
+									"anonymous": false,
+									"eventSelector": "432e4113d65e2e10f5bcbb0cbd25107dac6c25efe0a2b1c569e42e4916b5bee6",
+									"id": 28,
+									"name": "NFTBBurned",
+									"nameLocation": "509:10:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 27,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 24,
+												"indexed": true,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "536:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 28,
+												"src": "520:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 23,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "520:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 26,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "550:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 28,
+												"src": "542:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 25,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "542:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "519:38:0"
+									},
+									"src": "503:55:0"
+								},
+								{
+									"anonymous": false,
+									"eventSelector": "a2829440fb6b10d7e52bbd234987ea8c2d412132e9c7fc9cfae9934be1c789b3",
+									"id": 34,
+									"name": "BurnDividendClaimed",
+									"nameLocation": "570:19:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 33,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 30,
+												"indexed": true,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "606:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 34,
+												"src": "590:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 29,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "590:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 32,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "620:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 34,
+												"src": "612:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 31,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "612:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "589:38:0"
+									},
+									"src": "564:64:0"
+								},
+								{
+									"anonymous": false,
+									"eventSelector": "783e94f010bc7ce1bb1c87194a287f631a57ac415c2b3a09607225bc773c0288",
+									"id": 42,
+									"name": "BurnExecuted",
+									"nameLocation": "640:12:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 41,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 36,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "burnAmount",
+												"nameLocation": "661:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 42,
+												"src": "653:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 35,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "653:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 38,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "toDead",
+												"nameLocation": "681:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 42,
+												"src": "673:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 37,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "673:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 40,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "toDividend",
+												"nameLocation": "697:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 42,
+												"src": "689:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 39,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "689:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "652:56:0"
+									},
+									"src": "634:75:0"
+								},
+								{
+									"documentation": {
+										"id": 43,
+										"nodeType": "StructuredDocumentation",
+										"src": "792:62:0",
+										"text": "@notice 设置用户 NFT 分红资格（新获得资格）"
+									},
+									"functionSelector": "b631c4ca",
+									"id": 52,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "setNFTQualification",
+									"nameLocation": "869:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 50,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 45,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "897:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 52,
+												"src": "889:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 44,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "889:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 47,
+												"mutability": "mutable",
+												"name": "qualified",
+												"nameLocation": "908:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 52,
+												"src": "903:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 46,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "903:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 49,
+												"mutability": "mutable",
+												"name": "stakeAmount",
+												"nameLocation": "927:11:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 52,
+												"src": "919:19:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 48,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "919:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "888:51:0"
+									},
+									"returnParameters": {
+										"id": 51,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "948:0:0"
+									},
+									"scope": 215,
+									"src": "860:89:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 53,
+										"nodeType": "StructuredDocumentation",
+										"src": "957:56:0",
+										"text": "@notice 更新已有 NFT 资格用户的质押金额"
+									},
+									"functionSelector": "f6fe47f1",
+									"id": 60,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "updateNFTStake",
+									"nameLocation": "1028:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 58,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 55,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "1051:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 60,
+												"src": "1043:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 54,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1043:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 57,
+												"mutability": "mutable",
+												"name": "newAmount",
+												"nameLocation": "1065:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 60,
+												"src": "1057:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 56,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1057:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1042:33:0"
+									},
+									"returnParameters": {
+										"id": 59,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "1084:0:0"
+									},
+									"scope": 215,
+									"src": "1019:66:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 61,
+										"nodeType": "StructuredDocumentation",
+										"src": "1093:35:0",
+										"text": "@notice 撤销用户 NFT 资格"
+									},
+									"functionSelector": "28678102",
+									"id": 66,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "revokeNFTQualification",
+									"nameLocation": "1143:22:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 64,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 63,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "1174:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 66,
+												"src": "1166:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 62,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1166:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1165:14:0"
+									},
+									"returnParameters": {
+										"id": 65,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "1188:0:0"
+									},
+									"scope": 215,
+									"src": "1134:55:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 67,
+										"nodeType": "StructuredDocumentation",
+										"src": "1197:61:0",
+										"text": "@notice 累积 NFT 分红奖励（payable，传入 BNB）"
+									},
+									"functionSelector": "5c153adc",
+									"id": 72,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "accumulateNftReward",
+									"nameLocation": "1273:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 70,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 69,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "1301:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 72,
+												"src": "1293:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 68,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1293:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1292:16:0"
+									},
+									"returnParameters": {
+										"id": 71,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "1325:0:0"
+									},
+									"scope": 215,
+									"src": "1264:62:0",
+									"stateMutability": "payable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 73,
+										"nodeType": "StructuredDocumentation",
+										"src": "1334:66:0",
+										"text": "@notice 更新用户有效质押状态（用于燃烧分红）"
+									},
+									"functionSelector": "ff117898",
+									"id": 82,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "updateValidStake",
+									"nameLocation": "1415:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 80,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 75,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "1440:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 82,
+												"src": "1432:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 74,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1432:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 77,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "1454:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 82,
+												"src": "1446:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 76,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1446:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 79,
+												"mutability": "mutable",
+												"name": "isValid",
+												"nameLocation": "1467:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 82,
+												"src": "1462:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 78,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "1462:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1431:44:0"
+									},
+									"returnParameters": {
+										"id": 81,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "1484:0:0"
+									},
+									"scope": 215,
+									"src": "1406:79:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 83,
+										"nodeType": "StructuredDocumentation",
+										"src": "1493:65:0",
+										"text": "@notice 清理过期 NFT 持有者，返回本次清理数量"
+									},
+									"functionSelector": "97fed038",
+									"id": 88,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "cleanupExpiredNftHolders",
+									"nameLocation": "1573:24:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 84,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "1597:2:0"
+									},
+									"returnParameters": {
+										"id": 87,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 86,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 88,
+												"src": "1618:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 85,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1618:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1617:9:0"
+									},
+									"scope": 215,
+									"src": "1564:63:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 89,
+										"nodeType": "StructuredDocumentation",
+										"src": "1635:66:0",
+										"text": "@notice 清理过期有效质押者，返回本次清理数量"
+									},
+									"functionSelector": "e9949e26",
+									"id": 94,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "cleanupExpiredValidStakeHolders",
+									"nameLocation": "1716:31:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 90,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "1747:2:0"
+									},
+									"returnParameters": {
+										"id": 93,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 92,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 94,
+												"src": "1768:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 91,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1768:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1767:9:0"
+									},
+									"scope": 215,
+									"src": "1707:70:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 95,
+										"nodeType": "StructuredDocumentation",
+										"src": "1785:66:0",
+										"text": "@notice 代用户领取燃烧分红（复投时自动调用）"
+									},
+									"functionSelector": "b6dfe6ad",
+									"id": 102,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "claimBurnDividendFor",
+									"nameLocation": "1866:20:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 98,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 97,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "1895:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 102,
+												"src": "1887:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 96,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1887:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1886:14:0"
+									},
+									"returnParameters": {
+										"id": 101,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 100,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 102,
+												"src": "1919:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 99,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1919:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1918:9:0"
+									},
+									"scope": 215,
+									"src": "1857:71:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 103,
+										"nodeType": "StructuredDocumentation",
+										"src": "1991:60:0",
+										"text": "@notice 用户领取 NFT 分红（销毁 NFTB 换 BNB）"
+									},
+									"functionSelector": "ddda100d",
+									"id": 108,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "claimNftDividend",
+									"nameLocation": "2066:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 106,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 105,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "2091:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 108,
+												"src": "2083:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 104,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2083:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2082:16:0"
+									},
+									"returnParameters": {
+										"id": 107,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2107:0:0"
+									},
+									"scope": 215,
+									"src": "2057:51:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 109,
+										"nodeType": "StructuredDocumentation",
+										"src": "2116:61:0",
+										"text": "@notice NFTB 自动兑换回调（NFTB 转入时触发）"
+									},
+									"functionSelector": "94f7693a",
+									"id": 116,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "autoClaimForUser",
+									"nameLocation": "2192:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 114,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 111,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "2217:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 116,
+												"src": "2209:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 110,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "2209:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 113,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "2231:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 116,
+												"src": "2223:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 112,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2223:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2208:30:0"
+									},
+									"returnParameters": {
+										"id": 115,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2247:0:0"
+									},
+									"scope": 215,
+									"src": "2183:65:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 117,
+										"nodeType": "StructuredDocumentation",
+										"src": "2256:52:0",
+										"text": "@notice 用户领取燃烧分红（XYY 代币）"
+									},
+									"functionSelector": "caf55137",
+									"id": 120,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "claimBurnDividend",
+									"nameLocation": "2323:17:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 118,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2340:2:0"
+									},
+									"returnParameters": {
+										"id": 119,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2351:0:0"
+									},
+									"scope": 215,
+									"src": "2314:38:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 121,
+										"nodeType": "StructuredDocumentation",
+										"src": "2409:81:0",
+										"text": "@notice 执行底池燃烧（由 Contract A 的 triggerDailyProcess 调用）"
+									},
+									"functionSelector": "de9eb5a0",
+									"id": 124,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "executeDailyBurn",
+									"nameLocation": "2505:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 122,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2521:2:0"
+									},
+									"returnParameters": {
+										"id": 123,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2532:0:0"
+									},
+									"scope": 215,
+									"src": "2496:37:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 125,
+										"nodeType": "StructuredDocumentation",
+										"src": "2541:51:0",
+										"text": "@notice 接收燃烧分红代币并更新账本"
+									},
+									"functionSelector": "6f45b423",
+									"id": 130,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "receiveBurnDividend",
+									"nameLocation": "2607:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 128,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 127,
+												"mutability": "mutable",
+												"name": "toDividend",
+												"nameLocation": "2635:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 130,
+												"src": "2627:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 126,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2627:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2626:20:0"
+									},
+									"returnParameters": {
+										"id": 129,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2655:0:0"
+									},
+									"scope": 215,
+									"src": "2598:58:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "3d5d6096",
+									"id": 137,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "hasNftQualification",
+									"nameLocation": "2722:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 133,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 132,
+												"mutability": "mutable",
+												"name": "account",
+												"nameLocation": "2750:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 137,
+												"src": "2742:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 131,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "2742:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2741:17:0"
+									},
+									"returnParameters": {
+										"id": 136,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 135,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 137,
+												"src": "2782:4:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 134,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "2782:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2781:6:0"
+									},
+									"scope": 215,
+									"src": "2713:75:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "c37e450c",
+									"id": 144,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "nftStakeAmount",
+									"nameLocation": "2803:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 140,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 139,
+												"mutability": "mutable",
+												"name": "account",
+												"nameLocation": "2826:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 144,
+												"src": "2818:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 138,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "2818:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2817:17:0"
+									},
+									"returnParameters": {
+										"id": 143,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 142,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 144,
+												"src": "2858:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 141,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2858:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2857:9:0"
+									},
+									"scope": 215,
+									"src": "2794:73:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "5cb769ba",
+									"id": 151,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "pendingNftReward",
+									"nameLocation": "2882:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 147,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 146,
+												"mutability": "mutable",
+												"name": "account",
+												"nameLocation": "2907:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 151,
+												"src": "2899:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 145,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "2899:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2898:17:0"
+									},
+									"returnParameters": {
+										"id": 150,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 149,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 151,
+												"src": "2939:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 148,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2939:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2938:9:0"
+									},
+									"scope": 215,
+									"src": "2873:75:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "7122e063",
+									"id": 158,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "pendingBurnDividend",
+									"nameLocation": "2963:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 154,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 153,
+												"mutability": "mutable",
+												"name": "account",
+												"nameLocation": "2991:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 158,
+												"src": "2983:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 152,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "2983:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2982:17:0"
+									},
+									"returnParameters": {
+										"id": 157,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 156,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 158,
+												"src": "3023:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 155,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3023:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3022:9:0"
+									},
+									"scope": 215,
+									"src": "2954:78:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "9a280d4e",
+									"id": 163,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "totalNftStakeAmount",
+									"nameLocation": "3047:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 159,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3066:2:0"
+									},
+									"returnParameters": {
+										"id": 162,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 161,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 163,
+												"src": "3092:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 160,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3092:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3091:9:0"
+									},
+									"scope": 215,
+									"src": "3038:63:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "82179904",
+									"id": 168,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "totalValidStakeAmount",
+									"nameLocation": "3116:21:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 164,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3137:2:0"
+									},
+									"returnParameters": {
+										"id": 167,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 166,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 168,
+												"src": "3163:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 165,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3163:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3162:9:0"
+									},
+									"scope": 215,
+									"src": "3107:65:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "fee68cda",
+									"id": 173,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "nftDividendPool",
+									"nameLocation": "3187:15:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 169,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3202:2:0"
+									},
+									"returnParameters": {
+										"id": 172,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 171,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 173,
+												"src": "3228:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 170,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3228:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3227:9:0"
+									},
+									"scope": 215,
+									"src": "3178:59:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "24e83345",
+									"id": 178,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "burnDividendPool",
+									"nameLocation": "3252:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 174,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3268:2:0"
+									},
+									"returnParameters": {
+										"id": 177,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 176,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 178,
+												"src": "3294:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 175,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3294:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3293:9:0"
+									},
+									"scope": 215,
+									"src": "3243:60:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "c52bb19e",
+									"id": 183,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "accNftPerShare",
+									"nameLocation": "3318:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 179,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3332:2:0"
+									},
+									"returnParameters": {
+										"id": 182,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 181,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 183,
+												"src": "3358:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 180,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3358:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3357:9:0"
+									},
+									"scope": 215,
+									"src": "3309:58:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "c8a0e14c",
+									"id": 188,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "accBurnPerShare",
+									"nameLocation": "3382:15:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 184,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3397:2:0"
+									},
+									"returnParameters": {
+										"id": 187,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 186,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 188,
+												"src": "3423:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 185,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3423:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3422:9:0"
+									},
+									"scope": 215,
+									"src": "3373:59:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "e3067449",
+									"id": 193,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "lastBurnTime",
+									"nameLocation": "3447:12:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 189,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3459:2:0"
+									},
+									"returnParameters": {
+										"id": 192,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 191,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 193,
+												"src": "3485:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 190,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3485:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3484:9:0"
+									},
+									"scope": 215,
+									"src": "3438:56:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "19b74894",
+									"id": 202,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "batchSetNFTQualification",
+									"nameLocation": "3558:24:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 200,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 196,
+												"mutability": "mutable",
+												"name": "users",
+												"nameLocation": "3602:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 202,
+												"src": "3583:24:0",
+												"stateVariable": false,
+												"storageLocation": "calldata",
+												"typeDescriptions": {
+													"typeIdentifier": "t_array$_t_address_$dyn_calldata_ptr",
+													"typeString": "address[]"
+												},
+												"typeName": {
+													"baseType": {
+														"id": 194,
+														"name": "address",
+														"nodeType": "ElementaryTypeName",
+														"src": "3583:7:0",
+														"stateMutability": "nonpayable",
+														"typeDescriptions": {
+															"typeIdentifier": "t_address",
+															"typeString": "address"
+														}
+													},
+													"id": 195,
+													"nodeType": "ArrayTypeName",
+													"src": "3583:9:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+														"typeString": "address[]"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 199,
+												"mutability": "mutable",
+												"name": "stakeAmounts",
+												"nameLocation": "3628:12:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 202,
+												"src": "3609:31:0",
+												"stateVariable": false,
+												"storageLocation": "calldata",
+												"typeDescriptions": {
+													"typeIdentifier": "t_array$_t_uint256_$dyn_calldata_ptr",
+													"typeString": "uint256[]"
+												},
+												"typeName": {
+													"baseType": {
+														"id": 197,
+														"name": "uint256",
+														"nodeType": "ElementaryTypeName",
+														"src": "3609:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint256",
+															"typeString": "uint256"
+														}
+													},
+													"id": 198,
+													"nodeType": "ArrayTypeName",
+													"src": "3609:9:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+														"typeString": "uint256[]"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3582:59:0"
+									},
+									"returnParameters": {
+										"id": 201,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3650:0:0"
+									},
+									"scope": 215,
+									"src": "3549:102:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "3b0d1357",
+									"id": 211,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "batchSetValidStake",
+									"nameLocation": "3666:18:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 209,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 205,
+												"mutability": "mutable",
+												"name": "users",
+												"nameLocation": "3704:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 211,
+												"src": "3685:24:0",
+												"stateVariable": false,
+												"storageLocation": "calldata",
+												"typeDescriptions": {
+													"typeIdentifier": "t_array$_t_address_$dyn_calldata_ptr",
+													"typeString": "address[]"
+												},
+												"typeName": {
+													"baseType": {
+														"id": 203,
+														"name": "address",
+														"nodeType": "ElementaryTypeName",
+														"src": "3685:7:0",
+														"stateMutability": "nonpayable",
+														"typeDescriptions": {
+															"typeIdentifier": "t_address",
+															"typeString": "address"
+														}
+													},
+													"id": 204,
+													"nodeType": "ArrayTypeName",
+													"src": "3685:9:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+														"typeString": "address[]"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 208,
+												"mutability": "mutable",
+												"name": "amounts",
+												"nameLocation": "3730:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 211,
+												"src": "3711:26:0",
+												"stateVariable": false,
+												"storageLocation": "calldata",
+												"typeDescriptions": {
+													"typeIdentifier": "t_array$_t_uint256_$dyn_calldata_ptr",
+													"typeString": "uint256[]"
+												},
+												"typeName": {
+													"baseType": {
+														"id": 206,
+														"name": "uint256",
+														"nodeType": "ElementaryTypeName",
+														"src": "3711:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint256",
+															"typeString": "uint256"
+														}
+													},
+													"id": 207,
+													"nodeType": "ArrayTypeName",
+													"src": "3711:9:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+														"typeString": "uint256[]"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3684:54:0"
+									},
+									"returnParameters": {
+										"id": 210,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3747:0:0"
+									},
+									"scope": 215,
+									"src": "3657:91:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "0fc0482a",
+									"id": 214,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "lockMigration",
+									"nameLocation": "3763:13:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 212,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3776:2:0"
+									},
+									"returnParameters": {
+										"id": 213,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3787:0:0"
+									},
+									"scope": 215,
+									"src": "3754:34:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								}
+							],
+							"scope": 216,
+							"src": "214:3577:0",
+							"usedErrors": [],
+							"usedEvents": [
+								10,
+								16,
+								22,
+								28,
+								34,
+								42
+							]
+						}
+					],
+					"src": "33:3760:0"
+				},
+				"id": 0
+			}
+		}
+	}
+}
